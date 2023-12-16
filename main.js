@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
     logoutButton.addEventListener('click', function () {
         // Clear user information from localStorage and redirect to the login page
         localStorage.removeItem('user_id');
-        window.location.href = 'signInn.html'; // Update with your login page
+        window.location.href = 'login.html'; // Update with your login page
     });
 
     // Function to fetch and display tasks for the signed-in user
