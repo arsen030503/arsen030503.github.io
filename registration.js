@@ -1,77 +1,95 @@
-let todos = [];
-document.addEventListener('DOMContentLoaded', () => {
+// registration
+document.addEventListener('DOMContentLoaded', function() {
     const registrationForm = document.getElementById('registration-form');
-    const loginForm = document.getElementById('login-form');
 
-    registrationForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        handleFormSubmission(e.target);
-        const formType = e.target.dataset.formType;
-        const username = e.target.elements.username.value;
-        const password = e.target.elements.password.value;
+    registrationForm.addEventListener('submit', function(event) {
+        event.preventDefault();
 
-        if (formType === 'registration') {
-            sendDataToMockAPI({ username, password })
-                .then(responseData => {
-                    console.log('Response from MockAPI:', responseData);
-                    window.location.href = 'index.html';
+        // Get user input
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        // Make AJAX request to check if the user already exists
+        fetch(`https://657c8e02853beeefdb99a1d3.mockapi.io/users?username=${username}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                // User already exists
+                alert('User already exists. Please choose a different username.');
+            } else {
+                // User doesn't exist, proceed with registration
+                fetch('https://657c8e02853beeefdb99a1d3.mockapi.io/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Registration successful:', data);
+                    
+                    // Save the user's ID in localStorage
+                    localStorage.setItem('user_id', data.id);
+
+                    // Redirect to the main HTML page
+                    window.location.href = 'index.html';  // Update with your main page
                 })
                 .catch(error => {
-                    console.error('Error during MockAPI request:', error);
+                    console.error('Registration error:', error);
+                    // Handle errors during registration
                 });
-        }
-        const logoutButton = document.getElementById('logout-button');
-        logoutButton.addEventListener('click', () => {
-            localStorage.removeItem('currentUser');
-            window.location.href = 'registration.html';
+            }
+        })
+        .catch(error => {
+            console.error('User existence check error:', error);
+            // Handle errors during user existence check
         });
     });
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        handleFormSubmission(e.target);
-    });
-
-    function handleFormSubmission(form) {
-        const formType = form.dataset.formType;
-        const username = form.elements.username.value;
-        const password = form.elements.password.value;
-
-        if (formType === 'registration') {
-            // Регистрация пользователя
-            const user = { username, password };
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            // Перенаправление на главную страницу после регистрации
-            window.location.href = 'index.html';
-        } else if (formType === 'login') {
-            // Вход пользователя
-            const storedUser = JSON.parse(localStorage.getItem('currentUser'));
-
-            if (storedUser && storedUser.username === username && storedUser.password === password) {
-                // Если пользователь существует и пароль совпадает, перенаправить на главную страницу
-                window.location.href = 'index.html';
-            } else {
-                // Иначе, вывод ошибки или обработка неудачного входа
-                alert('Invalid username or password');
-            }
-        }
-    }
 });
 
-async function sendDataToMockAPI(data) {
-    try {
-        const mockApiUrl = 'https://6577300d197926adf62d9a45.mockapi.io/users'
-        const response = await fetch(mockApiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
+// sign in
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('login-form');
 
-        const responseData = await response.json();
-        return responseData;
-    } catch (error) {
-        console.error('Error:', error);
-        throw error;
-    }
-}
+    loginForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Get user input
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+
+        // Make AJAX request to check if the user exists and the password is correct for login
+        fetch(`https://657c8e02853beeefdb99a1d3.mockapi.io/users?username=${username}&password=${password}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                // User exists, check if the password matches
+                const user = data[0];
+                if (user.password === password) {
+                    // Password is correct, proceed with login
+                    console.log('Login successful:', user);
+
+                    // Save the user's ID in localStorage
+                    localStorage.setItem('user_id', user.id);
+
+                    // Redirect to the main HTML page
+                    window.location.href = 'index.html';  // Update with your main page
+                } else {
+                    // Password is incorrect
+                    alert('Incorrect username or password. Please try again.');
+                }
+            } else {
+                // User doesn't exist
+                alert('User does not exist. Please check your username or sign up.');
+            }
+        })
+        .catch(error => {
+            console.error('Login error:', error);
+            // Handle errors during login
+        });
+    });
+});
