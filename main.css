@@ -248,4 +248,33 @@ input:checked ~ .bubble::after {
 
 .logout-button:hover {
     background-color: #C92B87;
+<<<<<<< HEAD
+}
+
+.task {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.delete-button, .edit-button, .save-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: #f00; /* Delete button background color */
+    color: #fff; /* Delete button text color */
+    border: none;
+    margin: 2px;
+	margin-left: 10px;
+}
+
+.edit-button {
+    background-color: #00f; /* Edit button background color */
+	margin-right: 100px;	
+}
+
+.save-button {
+	background-color: orange;
+	margin-right: 200px;
 }
